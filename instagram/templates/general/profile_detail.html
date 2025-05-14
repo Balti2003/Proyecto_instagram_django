@@ -22,5 +22,14 @@
     {% if profile.user == request.user %}
       <p><a href="{% url 'profile_update' profile.pk %}">Editar</a></p>
     {% endif %}
+
+    <section>
+      <h2>Publicaciones</h2>
+
+      {% for post in profile.user.posts.all %}
+        {% include '_includes/posts/_post.html' %}
+        <hr class="hr"/>
+      {% endfor %}
+    </section>
 </div>
 {% endblock %}

@@ -1,0 +1,86 @@
+
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+from django.views.generic import TemplateView, CreateView, FormView, DetailView, UpdateView
+from django.urls import reverse_lazy, reverse
+from .forms import RegistrationForm, LoginForm
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from profiles.models import UserProfile
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from posts.models import Post
+
+class HomeView(TemplateView):
+    template_name = 'general/home.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        last_posts = Post.objects.all().order_by('-created_at')[:5]
+        context['last_posts'] = last_posts
+        
+        return context
+
+
+class LoginView(FormView):
+    template_name = 'general/login.html'
+    form_class = LoginForm
+    success_url = reverse_lazy('home')
+    
+    def form_valid(self, form):
+        usuario = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(username=usuario, password=password)
+        
+        if user is not None:
+            login(self.request, user)
+            messages.add_message(self.request, messages.SUCCESS, "Has iniciado sesion correctamente")
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            messages.add_message(self.request, messages.ERROR, "Usuario o contraseña incorrectos")
+            return super(LoginView, self).form_valid(form)
+    
+class RegisterView(CreateView):
+    model = User
+    template_name = 'general/register.html'
+    success_url = reverse_lazy('login')
+    form_class = RegistrationForm
+    
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS, "Usuario creado correctamente")
+        return super(RegisterView, self).form_valid(form)
+  
+    
+class LegalView(TemplateView):
+    template_name = 'general/legal.html'
+    
+
+class ContactView(TemplateView):
+    template_name = 'general/contact.html'
+
+@method_decorator(login_required, name='dispatch')
+class ProfileDetailView(DetailView):
+    model = UserProfile
+    template_name = 'general/profile_detail.html'
+    context_object_name = 'profile'
+
+@method_decorator(login_required, name='dispatch')
+class ProfileUpdateView(UpdateView):
+    model = UserProfile
+    template_name = 'general/profile_update.html'
+    context_object_name = 'profile'
+    fields = ['profile_picture', 'birth_date', 'bio']
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS, "Perfil editado correctamente")
+        return super(ProfileUpdateView, self).form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('profile_detail', args=[self.object.pk])
+
+@method_decorator(login_required, name='dispatch')
+def logout_view(request):
+    logout(request)
+    messages.add_message(request, messages.SUCCESS, "Has cerrado sesion correctamente")
+    return HttpResponseRedirect(reverse('home'))

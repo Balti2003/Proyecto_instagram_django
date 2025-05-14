@@ -1,0 +1,22 @@
+{% extends "general/layout.html" %}
+
+{% block head_title %}Bienvenido a instagram{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    {% include '_includes/_messages.html' %}
+
+    <h1>Home</h1>
+    <p>Bienvenido a instagram</p>
+
+    <section>
+        <h2>Ultimas publicaciones</h2>
+        
+        {% for post in last_posts %}
+            {% include '_includes/posts/_post.html' %}
+            <hr class="hr" />
+        {% endfor %}
+    </section>
+
+</div>
+{% endblock %}

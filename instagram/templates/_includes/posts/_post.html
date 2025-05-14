@@ -1,0 +1,6 @@
+<article>
+    <p>{{ post.caption }}</p>
+    <img width="150" src="{{ post.image.url }}" alt="{{ post.caption }}">
+    <p>Publicado por {{ post.user.email }} el {{ post.created_at }} - {{ post.likes.count }} Me gustas</p>
+
+</article>

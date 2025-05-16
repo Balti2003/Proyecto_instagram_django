@@ -4,7 +4,7 @@ from django.urls import path
 from .views import HomeView, LoginView, ProfileListView, RegisterView, LegalView, ContactView, logout_view, ProfileDetailView, ProfileUpdateView
 from django.conf import settings
 from django.conf.urls.static import static
-from posts.views import PostCreateView, PostDetailView, like_post
+from posts.views import PostCreateView, PostDetailView, like_post, like_post_ajax
 
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
@@ -19,6 +19,7 @@ urlpatterns = [
     path("posts/create/", PostCreateView.as_view(), name="post_create"),
     path("posts/<pk>/", PostDetailView.as_view(), name="post_detail"),
     path("posts/like/<pk>/", like_post, name="post_like"),
+    path("posts/like-ajax/<pk>/", like_post_ajax, name="post_like_ajax"),
     
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

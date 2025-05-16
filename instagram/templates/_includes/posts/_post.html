@@ -11,7 +11,7 @@
             <div class="feed-image p-2 px-3"><img class="img-fluid img-responsive" src="{{ post.image.url }}"></div>
             <footer>
                 <div class="text-center">
-                    <p>{{ post.likes.all.count }} 
+                    <p>{{ post.likes.all.count }}
                         {% if request.user in post.likes.all %}
                             <i class="bi bi-heart-fill"></i>
                         {% else %}

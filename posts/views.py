@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.views.generic.edit import CreateView
 from django.views.generic.detail import DetailView
 from posts.models import Post
@@ -39,4 +39,28 @@ def like_post(request, pk):
         messages.add_message(request, messages.INFO, "Te gusta esta publicacion")
         
     return HttpResponseRedirect(reverse('post_detail', args=[pk]))
+
+@login_required
+def like_post_ajax(request, pk):
+    post = Post.objects.get(pk=pk)
+    
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+        return JsonResponse(
+            {
+                "message": "Ya no te gusta esta publicacion",
+                "liked": False,
+                "nLikes": post.likes.all().count()
+            }
+        )
+    else:
+        post.likes.add(request.user)
+        return JsonResponse(
+            {
+                "message": "Te gusta esta publicacion",
+                "liked": True,
+                "nLikes": post.likes.all().count()
+            }
+        )
+    
      

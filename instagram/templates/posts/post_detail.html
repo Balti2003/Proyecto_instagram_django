@@ -22,7 +22,8 @@
                     <div class="p-2 px-3"><span>{{ post.caption }}</span></div>
                     <div class="feed-image p-2 px-3"><img class="img-fluid img-responsive" src="{{ post.image.url }}"></div>
                     <div class="text-center">
-                        <p>{{ post.likes.all.count }} <a href="{% url 'post_like' post.pk %}">
+                        <p><span id="nLikes">{{ post.likes.all.count }}</span> 
+                            <a id="likeButton" href="{% url 'post_like_ajax' post.pk %}">
                             {% if request.user in post.likes.all %}
                                 <i class="bi bi-heart-fill"></i>
                             {% else %}
@@ -33,4 +34,5 @@
         </article>
     </div>
 </div>
+
 {% endblock %}

@@ -1,8 +1,10 @@
+from django.http import HttpResponseRedirect
 from django.views.generic.edit import CreateView
+from django.views.generic.detail import DetailView
 from posts.models import Post
 from posts.forms import PostCreateForm
 from django.contrib import messages
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
@@ -18,3 +20,23 @@ class PostCreateView(CreateView):
         form.instance.user = self.request.user
         messages.add_message(self.request, messages.SUCCESS, "Publicacion creada correctamente")
         return super(PostCreateView, self).form_valid(form)
+    
+    
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'posts/post_detail.html'
+    context_object_name = 'post'
+    
+@login_required
+def like_post(request, pk):
+    post = Post.objects.get(pk=pk)
+    
+    if request.user in post.likes.all():
+        messages.add_message(request, messages.INFO, "Ya no te gusta esta publicacion")
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+        messages.add_message(request, messages.INFO, "Te gusta esta publicacion")
+        
+    return HttpResponseRedirect(reverse('post_detail', args=[pk]))
+     

@@ -1,12 +1,13 @@
-
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, CreateView, FormView, DetailView, UpdateView, ListView
 from django.urls import reverse_lazy, reverse
-from .forms import RegistrationForm, LoginForm, ProfileFollow
+
+from profiles.forms import FollowForm
+from .forms import RegistrationForm, LoginForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from profiles.models import UserProfile
+from profiles.models import Follow, UserProfile
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from posts.models import Post
@@ -16,10 +17,18 @@ class HomeView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        last_posts = Post.objects.all().order_by('-created_at')[:5]
+
+        # Si el usuario está logueado
+        if self.request.user.is_authenticated:
+            # Obtenemos los posts de los usuarios que seguimos
+            seguidos = Follow.objects.filter(follower=self.request.user.profile).values_list('following__user', flat=True)
+            # Nos traemos los posts de los usuarios que seguimos
+            last_posts = Post.objects.filter(user__profile__user__in=seguidos)
+
+        else:
+            last_posts = Post.objects.all().order_by('-created_at')[:10]
         context['last_posts'] = last_posts
-        
+
         return context
 
 
@@ -64,20 +73,45 @@ class ContactView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class ProfileDetailView(DetailView, FormView):
     model = UserProfile
-    template_name = 'general/profile_detail.html'
-    context_object_name = 'profile'
-    form_class = ProfileFollow
-    
+    template_name = "general/profile_detail.html"
+    context_object_name = "profile"
+    form_class = FollowForm
+
+    def get_initial(self):
+        self.initial['profile_pk'] =  self.get_object().pk
+        return super().get_initial()
+
     def form_valid(self, form):
-        profile_pk = form.cleaned_data['profile_pk']
-        profile = UserProfile.objects.get(pk=profile_pk)
-        self.request.user.profile.follow(profile)
-        
-        messages.add_message(self.request, messages.SUCCESS, "Usuario seguido correctamente")
-        return super(ProfileDetailView, self).form_valid(form)
-    
+        profile_pk = form.cleaned_data.get('profile_pk')
+        following = UserProfile.objects.get(pk=profile_pk)
+
+        if Follow.objects.filter(
+              follower=self.request.user.profile,
+              following=following
+        ).count():
+            Follow.objects.filter(
+                  follower=self.request.user.profile,
+                  following=following
+              ).delete()
+            messages.add_message(self.request, messages.SUCCESS, f"Se ha dejado de seguir a {following.user.username}")
+        else:
+            Follow.objects.get_or_create(
+              follower=self.request.user.profile,
+              following=following
+            )
+            messages.add_message(self.request, messages.SUCCESS, f"Se empieza a seguir a {following.user.username}")
+        return super().form_valid(form)
+
     def get_success_url(self):
-        return reverse('profile_detail', args=[self.request.user.profile.pk])
+        return reverse('profile_detail', args=[self.get_object().pk])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Comprobamos si seguimos al usuario
+        following = Follow.objects.filter(follower=self.request.user.profile, following=self.get_object()).exists()
+        context['following'] = following
+        return context
     
 
 @method_decorator(login_required, name='dispatch')

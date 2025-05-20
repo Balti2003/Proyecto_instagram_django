@@ -121,8 +121,10 @@ class ProfileListView(ListView):
     context_object_name = 'profiles'
     
     def get_queryset(self):
-        return UserProfile.objects.all().exclude(user=self.request.user)
-
+        if self.request.user.is_authenticated:
+            return UserProfile.objects.all().order_by('user__username').exclude(user=self.request.user)
+        
+        return UserProfile.objects.all().order_by('user__username')
 
 @method_decorator(login_required, name='dispatch')
 class ProfileUpdateView(UpdateView):
@@ -146,7 +148,7 @@ class ProfileUpdateView(UpdateView):
         return reverse('profile_detail', args=[self.object.pk])
 
 
-@method_decorator(login_required, name='dispatch')
+@login_required
 def logout_view(request):
     logout(request)
     messages.add_message(request, messages.SUCCESS, "Has cerrado sesion correctamente")

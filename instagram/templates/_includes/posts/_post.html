@@ -11,12 +11,16 @@
             <div class="feed-image p-2 px-3"><img class="img-fluid img-responsive" src="{{ post.image.url }}"></div>
             <footer>
                 <div class="text-center">
-                    <p>{{ post.likes.all.count }}
-                        {% if request.user in post.likes.all %}
-                            <i class="bi bi-heart-fill"></i>
-                        {% else %}
-                            <i class="bi bi-heart"></i>
-                        {% endif %}
+                    <p>
+                        <a href="{% url "post_like_ajax" post.pk %}" class="likeButton">
+                            <span>{{ post.likes.all.count }}</span>
+
+                            {% if request.user in post.likes.all %}
+                                <i class="bi bi-heart-fill"></i>
+                            {% else %}
+                                <i class="bi bi-heart"></i>
+                            {% endif %}
+                        </a>
                     </p>
                 </div>
                 <p class="text-center mt-3 mb-3">

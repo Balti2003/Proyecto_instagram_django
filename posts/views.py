@@ -57,7 +57,7 @@ def like_post_ajax(request, pk):
     post = Post.objects.get(pk=pk)
     
     if request.user in post.likes.all():
-        post.likes.remove(request.user)
+        post.unlike(request.user)
         return JsonResponse(
             {
                 "message": "Ya no te gusta esta publicacion",
@@ -66,7 +66,7 @@ def like_post_ajax(request, pk):
             }
         )
     else:
-        post.likes.add(request.user)
+        post.like(request.user)
         return JsonResponse(
             {
                 "message": "Te gusta esta publicacion",

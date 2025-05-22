@@ -17,8 +17,14 @@ class UserProfile(models.Model):
         return self.user.username
     
     def follow(self, profile):
-        Follow.objects.get_or_create(follower=self, following=profile)
-    
+        follow, created = Follow.objects.get_or_create(follower=self, following=profile)
+        return created
+        
+    def unfollow(self, profile):
+        if Follow.objects.filter(follower=self, following=profile).count():
+            Follow.objects.filter(follower=self, following=profile).delete()
+            return True
+        return False
     
 class Follow(models.Model):
     follower = models.ForeignKey(UserProfile, verbose_name="¿Quien sigue?", on_delete=models.CASCADE, related_name="follower_set")

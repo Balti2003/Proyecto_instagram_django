@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.views.generic.edit import CreateView
 from django.views.generic.detail import DetailView
 from posts.models import Post
-from posts.forms import PostCreateForm
+from posts.forms import PostCreateForm, CommentCreateForm
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
@@ -22,10 +22,22 @@ class PostCreateView(CreateView):
         return super(PostCreateView, self).form_valid(form)
     
     
-class PostDetailView(DetailView):
+class PostDetailView(DetailView, CreateView):
     model = Post
     template_name = 'posts/post_detail.html'
     context_object_name = 'post'
+    form_class = CommentCreateForm
+    
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.post = self.get_object()
+
+        return super(PostDetailView, self).form_valid(form)
+    
+    def get_success_url(self):
+        messages.add_message(self.request, messages.SUCCESS, "Comentario añadido correctamente")
+        return reverse("post_detail", args=[self.get_object().pk])
+    
     
 @login_required
 def like_post(request, pk):

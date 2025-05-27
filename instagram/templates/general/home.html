@@ -1,25 +1,38 @@
 {% extends "general/layout.html" %}
 
-{% block head_title %}Bienvenido a instagram{% endblock %}
+{% block head_title %}Bienvenido a Instagram{% endblock %}
 
 {% block page_content %}
-<div class="container">
+<div class="container py-5">
     {% include '_includes/_messages.html' %}
 
-    <h1>Home</h1>
-    <p>Bienvenido a instagram</p>
+    <!-- Card de bienvenida -->
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-body text-center">
+            <h1 class="card-title">📷 Bienvenido a Instagram</h1>
+            <p class="card-text lead">
+                Explora las últimas publicaciones, sigue a tus amigos y comparte tus momentos favoritos.
+            </p>
+        </div>
+    </div>
 
+    <!-- Sección de publicaciones -->
     <section>
-        <h2>Ultimas publicaciones</h2>
+        <h2 class="mb-4 text-primary text-center">📰 Últimas publicaciones</h2>
         
-        <div class="row">
+        <div class="row g-4">
             {% for post in last_posts %}
                 <div class="col-12 col-sm-6 col-md-4">
                     {% include '_includes/posts/_post.html' %}
                 </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        No hay publicaciones recientes todavía.
+                    </div>
+                </div>
             {% endfor %}
         </div>
     </section>
-
 </div>
 {% endblock %}

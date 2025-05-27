@@ -1,11 +1,65 @@
 {% extends "general/layout.html" %}
 
-{% block head_title %}Bienvenido a instagram{% endblock %}
+{% block head_title %}Aviso Legal | Instagram Clone{% endblock %}
 
 {% block page_content %}
-<div class="container">
+<div class="container py-5">
     {% include '_includes/_messages.html' %}
 
-    <h1>Aviso Legal</h1>
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            <h1 class="card-title text-center mb-4">📄 Aviso Legal</h1>
+
+            <section class="mb-4">
+                <p class="lead">
+                    Este sitio web ha sido creado con fines educativos como parte de un proyecto tipo clon de Instagram.
+                    No está afiliado ni respaldado por Instagram ni por Meta Platforms Inc.
+                </p>
+            </section>
+
+            <hr>
+
+            <section class="mb-4">
+                <h4 class="text-primary">👤 Titular del sitio</h4>
+                <ul class="list-unstyled ms-3">
+                    <li><strong>Desarrollador:</strong> Baltasar Dev</li>
+                    <li><strong>Email:</strong> <a href="mailto:baltasarlomello@live.com">baltasarlomello@live.com</a></li>
+                    <li><strong>Ubicación:</strong> Argentina</li>
+                </ul>
+            </section>
+
+            <section class="mb-4">
+                <h4 class="text-primary">🔐 Propiedad intelectual</h4>
+                <p>
+                    Todo el contenido de esta plataforma es para uso educativo. Las imágenes, textos y código fuente
+                    pertenecen a sus respectivos autores. No se permite su uso con fines comerciales.
+                </p>
+            </section>
+
+            <section class="mb-4">
+                <h4 class="text-primary">⚠️ Responsabilidad</h4>
+                <p>
+                    El creador del sitio no se responsabiliza por el uso indebido de la plataforma ni por los contenidos
+                    generados por los usuarios durante las pruebas.
+                </p>
+            </section>
+
+            <section class="mb-4">
+                <h4 class="text-primary">🔒 Privacidad</h4>
+                <p>
+                    Este sitio no recopila datos personales reales. Toda la funcionalidad está diseñada con fines
+                    de desarrollo y prueba.
+                </p>
+            </section>
+
+            <section>
+                <h4 class="text-primary">✉️ Contacto</h4>
+                <p>
+                    Para consultas relacionadas con el sitio o el código fuente, puedes escribir a:
+                    <a href="mailto:baltasarlomello@live.com">baltasarlomello@live.com</a>.
+                </p>
+            </section>
+        </div>
+    </div>
 </div>
 {% endblock %}

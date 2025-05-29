@@ -4,13 +4,14 @@ from django.views.generic import TemplateView, CreateView, FormView, DetailView,
 from django.urls import reverse_lazy, reverse
 
 from profiles.forms import FollowForm
-from .forms import RegistrationForm, LoginForm
+from .forms import RegistrationForm, LoginForm, ContactForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from profiles.models import Follow, UserProfile
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from posts.models import Post
+
 
 class HomeView(TemplateView):
     template_name = 'general/home.html'
@@ -66,8 +67,19 @@ class LegalView(TemplateView):
     template_name = 'general/legal.html'
     
 
-class ContactView(TemplateView):
+class ContactView(TemplateView, FormView):
     template_name = 'general/contact.html'
+    form_class = ContactForm
+    success_url = reverse_lazy('contact')
+    
+    def form_valid(self, form):
+        nombre = form.cleaned_data['nombre']
+        email = form.cleaned_data['email']
+        mensaje = form.cleaned_data['mensaje']
+        
+        messages.add_message(self.request, messages.SUCCESS, "Mensaje enviado correctamente")
+        return super().form_valid(form)
+    
 
 
 @method_decorator(login_required, name='dispatch')

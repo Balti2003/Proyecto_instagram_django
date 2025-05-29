@@ -26,6 +26,9 @@ class UserProfile(models.Model):
             return True
         return False
     
+    def followers_count(self):
+        return Follow.objects.filter(following=self).count()
+    
 class Follow(models.Model):
     follower = models.ForeignKey(UserProfile, verbose_name="¿Quien sigue?", on_delete=models.CASCADE, related_name="follower_set")
     following = models.ForeignKey(UserProfile, verbose_name="¿A quien sigue?", on_delete=models.CASCADE, related_name="following_set")

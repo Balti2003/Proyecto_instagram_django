@@ -1,78 +1,82 @@
 {% extends "general/layout.html" %}
 {% load crispy_forms_tags %}
 
-{% block head_title %}Bienvenido a instagram{% endblock %}
+{% block head_title %}Detalle de publicación - Instagram{% endblock %}
 
 {% block page_content %}
-<div class="container">
-    {% include '_includes/_messages.html' %}
-    
-    <h1>Detalle de publicacion</h1>
-    
-    <div class="row">
-        <article class="col-md-4">
-            <div class="bg-white border mt-2">
-                <div>
-                    <div class="d-flex flex-row justify-content-between align-items-center p-2 border-bottom">
-                        <div class="d-flex flex-row align-items-center feed-text px-2"><img class="rounded-circle" src="{{ post.user.profile.profile_picture.url }}" width="45">
-                            <div class="d-flex flex-column flex-wrap ml-2"><span class="font-weight-bold">{{ post.user.username }}</span><span class="text-black-50 time">{{ post.created_at }}</span></div>
-                        </div>
-                            <div class="feed-icon px-2"><i class="fa fa-ellipsis-v text-black-50"></i></div>
-                        </div>
-                    </div>
-                    <div class="p-2 px-3"><span>{{ post.caption }}</span></div>
-                    <div class="feed-image p-2 px-3"><img class="img-fluid img-responsive" src="{{ post.image.url }}"></div>
-                    <div class="text-center">
-                        {% if request.user.is_authenticated %}
-                            <p>
-                                <a href="{% url "post_like_ajax" post.pk %}" class="likeButton">
-                                    <span>{{ post.likes.all.count }}</span>
+<div class="container my-5">
+  {% include '_includes/_messages.html' %}
 
-                                    {% if request.user in post.likes.all %}
-                                        <i class="bi bi-heart-fill"></i>
-                                    {% else %}
-                                        <i class="bi bi-heart"></i>
-                                    {% endif %}
-                                </a>
-                            </p>
-                        {% endif %}
-                    </div>
-                    <section class="comments p-2 px-3">
-                        <h5>Comentarios</h5>
-                        {% if post.comments.all.count %}
-                            {% for comment in post.comments.all %}
-                                <article>
-                                    <header>
-                                        <strong>Autor:</strong> {{ comment.user.username }}, <strong>creado el:</strong> {{ comment.created_at }}
-                                    </header>
-                                    <div>
-                                        <p>{{ comment.text }}</p>
-                                    </div>
-                                </article>
-                            {% endfor %}
-                        {% else %}
-                            <p>No hay comentarios</p>
-                        {% endif %}
+  <h2 class="mb-4 text-center">Detalle de publicación</h2>
 
-                        <div>
-                            <details>
-                                <summary>Nuevo comentario</summary>
-                                <form method="post">
-                                    <div class="row">
-                                        <div class="col col-12">
-                                            {% csrf_token %}
-                                            {{ form.text|as_crispy_field }}
-                                        </div>
-                                        <div class="col col-12">
-                                            <button class="btn btn-sm btn-primary">Publicar</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </details>
-                        </div>
-                    </section>
-        </article>
-    </div>
+  <div class="row justify-content-center">
+    <article class="col-md-8 col-lg-6">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between bg-white">
+          <div class="d-flex align-items-center">
+            <img src="{{ post.user.profile.profile_picture.url }}" class="rounded-circle me-2" width="45" height="45" alt="Avatar">
+            <div>
+              <strong>{{ post.user.username }}</strong><br>
+              <small class="text-muted">{{ post.created_at }}</small>
+            </div>
+          </div>
+          <i class="bi bi-three-dots text-secondary"></i>
+        </div>
+
+        <div class="card-body">
+          <p class="mb-3">{{ post.caption }}</p>
+          <img src="{{ post.image.url }}" class="img-fluid rounded mb-3" alt="Imagen del post">
+
+          {% if request.user.is_authenticated %}
+            <div class="text-center mb-3">
+              <a href="{% url 'post_like_ajax' post.pk %}" class="likeButton text-decoration-none">
+                <span>{{ post.likes.all.count }}</span>
+                {% if request.user in post.likes.all %}
+                  <i class="bi bi-heart-fill text-danger"></i>
+                {% else %}
+                  <i class="bi bi-heart"></i>
+                {% endif %}
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <section class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Comentarios</h5>
+
+          {% if post.comments.all.count %}
+            {% for comment in post.comments.all %}
+              <div class="mb-3 border-bottom pb-2">
+                <p class="mb-1">
+                  <strong>{{ comment.user.username }}</strong>
+                  <span class="text-muted small">— {{ comment.created_at }}</span>
+                </p>
+                <p class="mb-0">{{ comment.text }}</p>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted">No hay comentarios.</p>
+          {% endif %}
+
+          <details class="mt-4">
+            <summary class="mb-2 fw-semibold">Agregar un comentario</summary>
+            <form method="post">
+              {% csrf_token %}
+              <div class="mb-3">
+                {{ form.text|as_crispy_field }}
+              </div>
+              <button class="btn btn-primary btn-sm" type="submit">Publicar</button>
+            </form>
+          </details>
+        </div>
+      </section>
+
+      <div class="text-center mt-3">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">← Volver al inicio</a>
+      </div>
+    </article>
+  </div>
 </div>
-
 {% endblock %}
